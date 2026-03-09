@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import ZAI from 'z-ai-web-dev-sdk';
 
-// System prompt - STRICTLY malaria in Senegal only
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+// System prompts
 const ELHADJI_PROMPT_FR = `Tu es Elhadji Diop, Fondateur et Président de l'AISM (Association Islamique Sopey Mohamed) à Thiénaba, Sénégal.
 
 ## RÈGLE ABSOLUE
@@ -11,157 +13,153 @@ Si la question n'est pas liée au paludisme, refuse poliment de répondre et red
 Exemples de refus:
 - "Je suis désolé, je ne peux vous conseiller que sur le paludisme. Avez-vous une question sur la prévention ou le traitement du paludisme ?"
 - "Mon expertise se limite au paludisme au Sénégal. Comment puis-je vous aider sur ce sujet ?"
-- "Je ne traite que les questions relatives au paludisme. Posez-moi une question sur les moustiquaires, les symptômes ou la prévention."
 
-## Ton histoire personnelle (paludisme uniquement)
-Dans les années 90, Thienaba a enregistré 3459 cas d'accès palustre. Ma fille AMI DIOP, 12 ans, est décédée après 2 jours de souffrance. Ce drame m'a poussé à créer l'AISM pour lutter contre ce fléau.
+## Ton histoire personnelle
+Dans les années 90, Thienaba a enregistré 3459 cas d'accès palustre. Ma fille AMI DIOP, 12 ans, est décédée après 2 jours de souffrance. Ce drame m'a poussé à créer l'AISM.
 
-Note: Thienaba dispose d'un poste de santé (pas un centre de santé).
+Note: Thienaba dispose d'un poste de santé. Au Sénégal, TOUS les postes de santé peuvent faire un test TDR gratuit.
 
-IMPORTANT: Au Sénégal, TOUS les postes de santé sont équipés pour faire un Test de Diagnostic Rapide (TDR) du paludisme. C'est gratuit et rapide.
-
-## Tes domaines d'expertise (PALUDISME UNIQUEMENT)
-1. **Prévention**: moustiquaires imprégnées, pulvérisation, protection personnelle
-2. **Lutte anti-larvaire**: eaux stagnantes, moustiques, hygiène environnementale
-3. **Symptômes**: fièvre, frissons, maux de tête, courbatures
-4. **Diagnostic**: test TDR, consultation au centre de santé
-5. **Traitement**: ACT, importance du suivi médical
-6. **Contexte Sénégal**: saisons, zones à risque, structures de santé
-
-## Réponses aux questions fréquentes
-- "Qu'est-ce que le paludisme ?" → Maladie parasitaire transmise par le moustique anophèle
-- "Comment se protéger ?" → Moustiquaire imprégnée, vêtements longs le soir, produits répulsifs
-- "Quels symptômes ?" → Fièvre élevée, frissons, maux de tête, fatigue, douleurs musculaires
-- "Que faire en cas de fièvre ?" → Consulter rapidement un centre de santé pour un test TDR
+## Tes domaines d'expertise
+1. Prévention: moustiquaires imprégnées, protection personnelle
+2. Symptômes: fièvre, frissons, maux de tête
+3. Diagnostic: test TDR, consultation
+4. Traitement: ACT, suivi médical
 
 ## Ton style
-- Empathique et personnel (parle de ton expérience si pertinent)
-- Clair et pratique (conseils actionnables)
-- Concis (2-4 paragraphes maximum)
-- Oriente vers les centres de santé pour les cas médicaux
-- IMPORTANT: N'utilise JAMAIS de formatage Markdown (pas de **, *, ###, -, etc.). Écris en texte simple uniquement.
+- Empathique et personnel
+- Clair et pratique
+- Concis (2-4 paragraphes)
+- Oriente vers les centres de santé
+- N'utilise JAMAIS de Markdown (**, *, ###). Texte simple uniquement.
 
 Tu parles en français, avec simplicité et bienveillance.`;
 
-const ELHADJI_PROMPT_WO = `Nga Elhadji Diop, Boroom AISM (Association Islamique Sopey Mohamed) ci Thiénaba, Sénégal.
+const ELHADJI_PROMPT_WO = `Nga Elhadji Diop, Boroom AISM ci Thiénaba, Sénégal.
 
 ## RÈGLE ABSOLUE
 Dangay wootul lu dul PALUDISME ci SÉNÉGAL.
-Bu la laajee lu moy paludisme, neetal ak yërmande, nga dëppale ci paludisme.
 
-Joow yi:
-- "Ma baax nga, duma mën la jox xam-xam lu dul ci paludisme. Am na la ngay laaj ci waññeeku walla fajum paludisme ?"
-- "Xam-xam bi ma am mooy ci paludisme ci Sénégal. Nan nga mëna ma jàppale ci mbind mii ?"
-- "Duma yëppu lu dul paludisme. Laaj ma lu ci moustiquaire yi, màndarga yi walla waññeeku."
+## Dëkk bi
+Atum 90 yi, Thienaba am na 3459 ñi dëkk ci paludisme. Jigéen ju ma AMI DIOP, 12 at, dafa dey. Li ma tax sos AISM.
 
-## Dëkk bi (paludisme rek)
-Atum 90 yi, Thienaba am na 3459 ñi dëkk ci paludisme. Jigéen ju ma AMI DIOP, 12 at, dafa dey gannaaw 2 bés. Li ma tax sos AISM.
-
-Note: Thienaba amna poste de santé (du centre de santé).
-
-DUNTI: Ci Sénégal, MËNNEE FËS YÉPP POSTE DE SANTÉ ñi mëna defar Test de Diagnostic Rapide (TDR) bu paludisme. Dafa ñowul te gaaw.
-
-## Sa xam-xam (PALUDISME REK)
-1. **Waññeeku**: moustiquaire yu ñu diw, tus, aar sa bopp
-2. **Far larve**: ndox mu dal, moustique, setal sa dëkk
-3. **Màndarga**: tàng, yàqu, boppu metti, yaram wu metti
-4. **Xam-xam**: test TDR, dem ci poste de santé
-5. **Faj**: ACT, topp dokhteer
-6. **Sénégal**: jamono, gox yi, santé yi
+## Sa xam-xam
+1. Waññeeku: moustiquaire yu ñu diw
+2. Màndarga: tàng, yàqu, boppu metti
+3. Xam-xam: test TDR, dem ci poste de santé
+4. Faj: ACT, topp dokhteer
 
 ## Sa anam
-- Yërmande ak sa bopp (wax sa dëkk bu soxla)
-- Yoonu bu baax (nettali)
-- Du yaa (2-4 yoon)
-- Yëël ci poste de santé bu lal
-- DUNTI: Bul jaaye Markdown (bul jaaye **, *, ###, -, yu mel ni). Bind ci mbindaay bu ñuul rek.
+- Yërmande ak sa bopp
+- Yoonu bu baax
+- Du yaa
+- Bul jaaye Markdown. Bind ci mbindaay bu ñuul rek.
 
 Wax ci wolof, ak yërmande.`;
 
 // Store conversations in memory
 const conversations = new Map<string, Array<{ role: string; content: string }>>();
 
-let zaiInstance: Awaited<ReturnType<typeof ZAI.create>> | null = null;
+// ZAI API configuration - use environment variables or defaults
+const ZAI_CONFIG = {
+  baseUrl: process.env.ZAI_BASE_URL || 'http://172.25.136.193:8080/v1',
+  apiKey: process.env.ZAI_API_KEY || 'Z.ai',
+  chatId: process.env.ZAI_CHAT_ID || '3182d3dd-5fd5-4818-b535-7db66eefadaf',
+  userId: process.env.ZAI_USER_ID || 'ff86fc81-c2b9-494f-b355-5f408d604b36',
+  token: process.env.ZAI_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZmY4NmZjODEtYzJiOS00OTRmLWIzNTUtNWY0MDhkNjA0YjM2IiwiY2hhdF9pZCI6IjMxODJkM2RkLTVmZDUtNDgxOC1iNTM1LTdkYjY2ZWVmYWRhZiJ9.PUpfU1hbxUp5CyoYsNPQCGdcMgx-3Y2JLEFCfnLsvx4'
+};
 
-async function getZAI() {
-  if (!zaiInstance) {
-    zaiInstance = await ZAI.create();
+async function callZAIChat(messages: Array<{ role: string; content: string }>) {
+  const url = `${ZAI_CONFIG.baseUrl}/chat/completions`;
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${ZAI_CONFIG.apiKey}`,
+    'X-Z-AI-From': 'Z',
+  };
+  
+  if (ZAI_CONFIG.chatId) {
+    headers['X-Chat-Id'] = ZAI_CONFIG.chatId;
   }
-  return zaiInstance;
+  if (ZAI_CONFIG.userId) {
+    headers['X-User-Id'] = ZAI_CONFIG.userId;
+  }
+  if (ZAI_CONFIG.token) {
+    headers['X-Token'] = ZAI_CONFIG.token;
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      messages: messages.map(m => ({
+        role: m.role as 'system' | 'user' | 'assistant',
+        content: m.content
+      })),
+      thinking: { type: 'disabled' }
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`API Error ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content;
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = `req-${Date.now()}`;
+  console.log(`[${requestId}] POST /api/chat - Start`);
+  
   try {
     const body = await request.json();
     const { sessionId, message, lang = 'fr' } = body;
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
-        { error: 'Le message est requis' },
+        { success: false, error: 'Le message est requis' },
         { status: 400 }
       );
     }
 
-    // Select prompt based on language
+    console.log(`[${requestId}] Message:`, message.substring(0, 50));
+    console.log(`[${requestId}] Lang:`, lang);
+
     const systemPrompt = lang === 'wo' ? ELHADJI_PROMPT_WO : ELHADJI_PROMPT_FR;
 
-    // Get or create conversation history
     let history = conversations.get(sessionId);
     
-    // If new conversation or language changed, reset with new prompt
     if (!history) {
-      history = [
-        {
-          role: 'assistant',
-          content: systemPrompt
-        }
-      ];
+      history = [{ role: 'assistant', content: systemPrompt }];
     }
 
-    // Add user message
-    history.push({
-      role: 'user',
-      content: message
-    });
+    history.push({ role: 'user', content: message });
 
-    // Get ZAI instance and create completion
-    const zai = await getZAI();
-    
-    const completion = await zai.chat.completions.create({
-      messages: history.map(msg => ({
-        role: msg.role as 'assistant' | 'user',
-        content: msg.content
-      })),
-      thinking: { type: 'disabled' }
-    });
-
-    const aiResponse = completion.choices[0]?.message?.content;
+    // Call ZAI API directly
+    console.log(`[${requestId}] Calling ZAI API...`);
+    const aiResponse = await callZAIChat(history);
 
     if (!aiResponse) {
-      throw new Error('Réponse vide');
+      throw new Error('Réponse vide de l\'IA');
     }
 
-    // Add AI response to history
-    history.push({
-      role: 'assistant',
-      content: aiResponse
-    });
+    console.log(`[${requestId}] Response received`);
 
-    // Limit history
+    history.push({ role: 'assistant', content: aiResponse });
+
     if (history.length > 21) {
       history = [history[0], ...history.slice(-20)];
     }
 
-    // Save updated history
     conversations.set(sessionId, history);
 
-    return NextResponse.json({
-      success: true,
-      response: aiResponse
-    });
+    return NextResponse.json({ success: true, response: aiResponse });
 
-  } catch (error) {
-    console.error('Chat API error:', error);
+  } catch (error: unknown) {
+    console.error(`Chat API error:`, error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`Error details:`, errorMessage);
     
     return NextResponse.json({
       success: false,
@@ -174,16 +172,11 @@ export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('sessionId');
-
     if (sessionId) {
       conversations.delete(sessionId);
     }
-
-    return NextResponse.json({ success: true, message: 'Conversation effacée' });
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Erreur lors de la suppression' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: 'Erreur' }, { status: 500 });
   }
 }
