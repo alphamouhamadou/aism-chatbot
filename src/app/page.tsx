@@ -76,28 +76,28 @@ const translations = {
     subtitle2: "Boroom AISM Thienaba",
     newBtn: "Bees",
     greeting: "Jàmm nga am ! 👋",
-    intro: "Man ma Elhadji Diop",
-    description: "Xam-xam ci waññeeku paludisme ci Sénégal.",
-    askMe: "Laaj ma sa laaj.",
+    intro: "Man maa di Elhadji Diop",
+    description: "Man maa di jëfandikukat ci aar ak xeex sibiru ci Senegaal..",
+    askMe: "Laajal ma loo bëgg xam.",
     storyTitle: "Samay dëkk :",
-    storyText: "Atum 90 yi, Thienaba am na 3459 ñi dëkk ci paludisme. Jigéen ju ma Ami Diop, 12 at, dafa dey. Li ma tax sos AISM.",
-    questionsLabel: "Laaj yi ci paludisme :",
-    placeholder: "Laaj sa laaj...",
+    storyText: "Ci atum 1990 yi, Thienaba amoon na 3459 nit ñu amoon paludisme. Sama doom ju jigéen Ami Diop, mi amoon 12 at, paludisme moo ko jël. Loolu moo ma tax ma sos AISM ngir xeex paludisme.",
+    questionsLabel: "Laaj yu jëm ci paludisme :",
+    placeholder: "Bindal sa laaj...",
     sendBtn: "Yónne",
     loading: "Di xalaat...",
-    error: "Jërëjëf, am na njumte. Jàppalaat.",
-    footer: "AISM Thienaba • Waññeeku Paludisme ci Sénégal 🇸🇳",
+    error: "Baaxul, am na njumte. Jéemaatal.",
+    footer: "AISM Thienaba • Xeex sibiru ci Senegaal 🇸🇳",
     listenIntro: "Dégg Elhadji",
     listenPrevention: "Waññeeku",
     listenImpact: "Jumtukaay AISM",
     questions: [
-      "Màndarga yi ci paludisme?",
-      "Nan waññeeku paludisme?",
-      "Lan def bu tàng?",
-      "Fu ma mën dem faj?",
-      "Paludisme ak ñu ëmb",
-      "Paludisme ak gone yi"
-    ]
+      "Làn mooy mandarga yu Sibiru ?",
+      "Nan lañu man a aar ci Sibiru ?",
+      "Làn nga wara def bi nga amé tàngoor yaram ?",
+      "Fan laa man a dem faju ?",
+      "Sibiru ak jigéen ñu ëmb",
+      "Sibiru ak xale yi"
+]
   }
 };
 
