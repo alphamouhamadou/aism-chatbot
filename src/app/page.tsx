@@ -97,7 +97,7 @@ const translations = {
       "Fan laa man a dem faju ?",
       "Sibiru ak jigéen ñu ëmb",
       "Sibiru ak xale yi"
-]
+    ]
   }
 };
 
