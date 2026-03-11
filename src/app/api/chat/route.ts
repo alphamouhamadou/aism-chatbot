@@ -59,49 +59,35 @@ Wax ci wolof, ak yërmande.`;
 // Store conversations in memory
 const conversations = new Map<string, Array<{ role: string; content: string }>>();
 
-// ZAI API configuration - use environment variables or defaults
-const ZAI_CONFIG = {
-  baseUrl: process.env.ZAI_BASE_URL || 'http://172.25.136.193:8080/v1',
-  apiKey: process.env.ZAI_API_KEY || 'Z.ai',
-  chatId: process.env.ZAI_CHAT_ID || '3182d3dd-5fd5-4818-b535-7db66eefadaf',
-  userId: process.env.ZAI_USER_ID || 'ff86fc81-c2b9-494f-b355-5f408d604b36',
-  token: process.env.ZAI_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZmY4NmZjODEtYzJiOS00OTRmLWIzNTUtNWY0MDhkNjA0YjM2IiwiY2hhdF9pZCI6IjMxODJkM2RkLTVmZDUtNDgxOC1iNTM1LTdkYjY2ZWVmYWRhZiJ9.PUpfU1hbxUp5CyoYsNPQCGdcMgx-3Y2JLEFCfnLsvx4'
-};
+// Groq API configuration
+const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-async function callZAIChat(messages: Array<{ role: string; content: string }>) {
-  const url = `${ZAI_CONFIG.baseUrl}/chat/completions`;
-  
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${ZAI_CONFIG.apiKey}`,
-    'X-Z-AI-From': 'Z',
-  };
-  
-  if (ZAI_CONFIG.chatId) {
-    headers['X-Chat-Id'] = ZAI_CONFIG.chatId;
-  }
-  if (ZAI_CONFIG.userId) {
-    headers['X-User-Id'] = ZAI_CONFIG.userId;
-  }
-  if (ZAI_CONFIG.token) {
-    headers['X-Token'] = ZAI_CONFIG.token;
+async function callGroqAPI(messages: Array<{ role: string; content: string }>) {
+  if (!GROQ_API_KEY) {
+    throw new Error('GROQ_API_KEY non configurée. Veuillez ajouter la clé dans les variables d\'environnement Vercel.');
   }
 
-  const response = await fetch(url, {
+  const response = await fetch(GROQ_API_URL, {
     method: 'POST',
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+    },
     body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
       messages: messages.map(m => ({
         role: m.role as 'system' | 'user' | 'assistant',
         content: m.content
       })),
-      thinking: { type: 'disabled' }
+      temperature: 0.7,
+      max_tokens: 1024,
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`API Error ${response.status}: ${errorText}`);
+    throw new Error(`Groq API Error ${response.status}: ${errorText}`);
   }
 
   const data = await response.json();
@@ -131,14 +117,14 @@ export async function POST(request: NextRequest) {
     let history = conversations.get(sessionId);
     
     if (!history) {
-      history = [{ role: 'assistant', content: systemPrompt }];
+      history = [{ role: 'system', content: systemPrompt }];
     }
 
     history.push({ role: 'user', content: message });
 
-    // Call ZAI API directly
-    console.log(`[${requestId}] Calling ZAI API...`);
-    const aiResponse = await callZAIChat(history);
+    // Call Groq API
+    console.log(`[${requestId}] Calling Groq API...`);
+    const aiResponse = await callGroqAPI(history);
 
     if (!aiResponse) {
       throw new Error('Réponse vide de l\'IA');
