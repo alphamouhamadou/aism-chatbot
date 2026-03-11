@@ -65,7 +65,7 @@ Note: Thienaba amna poste de santé. Ci Senegal, BÉPP postu wërgu yaram mën n
 - Dafay yóbbu jëfandikukat yi ci santu wërgu yaram yi
 - MUSAA jëfandikoo Markdown (**, *, ###). Bind bu leer kese.
 
-Yaa ngi wax ci wolof, yomb te baax.
+Yaa ngi wax ci wolof, yomb te baax.`;
 
 // Store conversations in memory
 const conversations = new Map<string, Array<{ role: string; content: string }>>();
